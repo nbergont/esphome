@@ -186,7 +186,7 @@ void AcDimmer::setup() {
     this->zero_cross_pin_->setup();
     this->store_.zero_cross_pin = this->zero_cross_pin_->to_isr();
     this->zero_cross_pin_->attach_interrupt(&AcDimmerDataStore::s_gpio_intr, &this->store_,
-                                            gpio::INTERRUPT_FALLING_EDGE);
+                                            this->zero_cross_pin_mode_);
   }
 
 #ifdef USE_ESP8266
@@ -223,6 +223,14 @@ void AcDimmer::dump_config() {
     ESP_LOGCONFIG(TAG, "   Method: leading");
   } else {
     ESP_LOGCONFIG(TAG, "   Method: trailing");
+  }
+
+  if (this->zero_cross_pin_mode_ == gpio::INTERRUPT_RISING_EDGE) {
+    ESP_LOGCONFIG(TAG, "   Zero-Cross Pin Mode: rising edge");
+  } else if (method_ == gpio::INTERRUPT_FALLING_EDGE) {
+    ESP_LOGCONFIG(TAG, "   Zero-Cross Pin Mode: falling edge");
+  } else {
+    ESP_LOGCONFIG(TAG, "   Zero-Cross Pin Mode: any edge");
   }
 
   LOG_FLOAT_OUTPUT(this);

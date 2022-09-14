@@ -16,9 +16,18 @@ DIM_METHODS = {
     "TRAILING": DimMethod.DIM_METHOD_TRAILING,
 }
 
+gpio_ns = cg.esphome_ns.namespace("gpio")
+InterruptType = gpio_ns.enum("InterruptType")
+ZC_MODE = {
+    "FALLING": InterruptType.INTERRUPT_FALLING_EDGE,
+    "RISING": InterruptType.INTERRUPT_RISING_EDGE,
+    "ANY": InterruptType.INTERRUPT_ANY_EDGE,
+}
+
 CONF_GATE_PIN = "gate_pin"
 CONF_ZERO_CROSS_PIN = "zero_cross_pin"
 CONF_INIT_WITH_HALF_CYCLE = "init_with_half_cycle"
+CONF_ZERO_CROSS_PIN_MODE = "zero_cross_pin_mode"
 CONFIG_SCHEMA = cv.All(
     output.FLOAT_OUTPUT_SCHEMA.extend(
         {
@@ -28,6 +37,9 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_INIT_WITH_HALF_CYCLE, default=True): cv.boolean,
             cv.Optional(CONF_METHOD, default="leading pulse"): cv.enum(
                 DIM_METHODS, upper=True, space="_"
+            ),
+            cv.Optional(CONF_ZERO_CROSS_PIN_MODE, default="falling"): cv.enum(
+                ZC_MODE, upper=True, space="_"
             ),
         }
     ).extend(cv.COMPONENT_SCHEMA),
@@ -50,3 +62,4 @@ async def to_code(config):
     cg.add(var.set_zero_cross_pin(pin))
     cg.add(var.set_init_with_half_cycle(config[CONF_INIT_WITH_HALF_CYCLE]))
     cg.add(var.set_method(config[CONF_METHOD]))
+    cg.add(var.set_zero_cross_pin_mode(config[CONF_ZERO_CROSS_PIN_MODE]))
